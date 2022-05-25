@@ -5,21 +5,23 @@ require("path");
 
 
 const serveAllRequests = function(req, res){
-    
+    if(req.method =="GET"){
         switch(req.url){
             case "/index.html":
-                serverIndex;
+                serverIndex(req,res);
                 break;
             case "/page1.html":
-                servePage1();
+                servePage1(req,res);
                 break;
             case "/page2.html":
-                servePage2();
+                servePage2(req,res);
                 break;
-            default: serverIndex();         
+            default: serverIndex(req,res);         
+        }
+    }else if(req.method=="POST"){
+    serveJson(req,res);
     }
 }
-
 let indexBufferFile;
 let page1BufferFile;
 let page2BufferFile;
@@ -37,6 +39,11 @@ const serverIndex = function(req,res){
     res.setHeader("Content-Type","text/html");
     res.writeHead(200);
     res.end(indexBufferFile);
+}
+const serveJson = function(req,res){
+    res.setHeader("Content-Type", "application/json");
+    res.writeHead(200);
+    res.end("{'message' : 'Hello JSON!'}");
 }
 
     fs.readFile(__dirname+"/public/index.html", function(err, buffer){

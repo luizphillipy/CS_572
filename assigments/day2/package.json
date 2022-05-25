@@ -1,0 +1,15 @@
+{
+  "name": "day2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "ass2d2.js",
+  "scripts": {
+    "start": "node ass2d2.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Luiz Sampaio",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
