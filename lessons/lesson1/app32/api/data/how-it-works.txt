@@ -1,0 +1,5 @@
+/api/games
+all games
+
+/api/games/3 GET
+one gameß
