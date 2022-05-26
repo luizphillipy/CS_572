@@ -1,0 +1,17 @@
+{
+  "name": "ex45",
+  "version": "1.0.0",
+  "description": "",
+  "main": "ex45.js",
+  "scripts": {
+    "start": "nodemon ex45.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Luiz Sampaio",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "nodemon": "^2.0.16"
+  }
+}

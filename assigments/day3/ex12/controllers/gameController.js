@@ -1,4 +1,4 @@
-const gamesData = require("../public/data/games.json");
+const gamesData = require("../../public/data/games.json");
 
 module.exports.getAll = function(req,res){
     console.log("GET all Games Data");

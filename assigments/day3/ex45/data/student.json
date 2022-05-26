@@ -1,0 +1,20 @@
+[
+  {
+    "_id": "628efa51de6621325d748954",
+    "index": 0,
+    "name": "John",
+    "gpa": 3.3
+  },
+  {
+    "_id": "628efa5173724d1d53410b6b",
+    "index": 1,
+    "name": "James",
+    "gpa": 2.5
+  },
+  {
+    "_id": "628efa51c31651788a6073a1",
+    "index": 2,
+    "name": "Jasmin",
+    "gpa": 3.8
+  }
+]
