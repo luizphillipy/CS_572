@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const Traveller = mongoose.model(process.env.TRAVELLER_MODEL);
 
 const _sendResponse = function(res,response){
-    res.status(response.status).json(response.message);
+    res.status(parseInt(response.status)).json(response.message);
 }
 
 const getAll = function(req, res){
@@ -26,8 +26,11 @@ const getAll = function(req, res){
 }
 const getOne = function(req,res){
     console.log("GET one loyaltyProgram Controller Requested");
+    console.log(req.params);
+
     const travellerId = req.params.travellerId;
     const loyaltyprogramId = req.params.loyaltyProgramId;
+    console.log(req.params.loyaltyProgramId);
     Traveller.findById(travellerId).select("loyaltyPrograms").exec(function(err,traveller){
         console.log(traveller.loyaltyPrograms.id(loyaltyprogramId));
         const response = {status:200, message:traveller.loyaltyPrograms.id(loyaltyprogramId)}
@@ -73,7 +76,7 @@ const addOne = function(req,res){
 // }
 const _addLoyaltyProgram = function(req,res,traveller){
     const newLoyaltyProgram = {
-        name: req.body.loyaltyProgramName,
+        name: req.body.name,
         memberId: req.body.memberId,
         milesAmount: req.body.milesAmount
     };
@@ -118,7 +121,7 @@ const deleteOne = function(req, res){
 };
 const _deleteLoyaltyProgram = function(req,res,traveller){
     const loyaltyprogram=req.params.loyaltyProgramId;
-    console.log(loyaltyprogram);
+    console.log("dentro _delete: ",loyaltyprogram);
     traveller.loyaltyPrograms.id(loyaltyprogram).remove();
     traveller.save(function(err,updatedTraveller){
         const response = {status: 201, message:"Loyalty Program Deleted"}
@@ -129,57 +132,88 @@ const _deleteLoyaltyProgram = function(req,res,traveller){
         res.status(response.status).json(response.message);
     });
 }
+const updatePartial = function(req,res){
+    console.log("LoyaltyProgram Update Partial controller Requested");
+    loyaltyProgramUpdatePartial = function(req,res,traveler, loyaltyProgramId,response){
+        console.log("Partial Update callback Function");
+        if(req.body.loyaltyProgramName){
+            traveler.loyaltyPrograms.id(loyaltyProgramId).name=req.body.loyaltyProgramName
+        };
+        if(req.body.memberId){
+            traveler.loyaltyPrograms.id(loyaltyProgramId).memberId = req.body.memberId;
+        };
+        if(req.body.memberId){
+            traveler.loyaltyPrograms.id(loyaltyProgramId).milesAmount = req.body.milesAmount;
+        };
+          console.log(traveler.loyaltyPrograms.id(loyaltyProgramId));
+          traveler.save().then(updatedLoyaltyprogram =>{
+            console.log("LoyaltProgram Sucessfully updated");
+            response.status=process.env.UPDATE_SUCCESS_STATUS_CODE;
+            response.message=updatedLoyaltyprogram;
+        }).catch(err=>{
+            console.log("Error updating loyaltyProgram: ",err);
+            response.status=process.env.UPDATE_ERROR_CODE;
+            response.message=err;
+        }).finally(() =>{
+            console.log("Response on finally Callback Function: ",response);
+          _sendResponse(res,response);
+
+        } );
+
+    };
+    _updateOne(req,res,loyaltyProgramUpdatePartial);
+}
   const updateFull = function(req,res){
       console.log("LoyaltProgram Update Full Controller Requested");
+      
       loyaltyprogramUpdate = function(req,res,traveler,loyaltyProgramId,response){
+          console.log("arrived on callbakc: ",res.status);
           console.log("in the callback function");
-          console.log(loyaltyProgramId);
-          traveler.loyaltyPrograms.id(loyaltyProgramId).name=req.body.loyaltyProgramName;
+         // console.log(loyaltyProgramId);
+          traveler.loyaltyPrograms.id(loyaltyProgramId).name=req.body.name;
           traveler.loyaltyPrograms.id(loyaltyProgramId).memberId = req.body.memberId;
           traveler.loyaltyPrograms.id(loyaltyProgramId).milesAmount = req.body.milesAmount;
           console.log(traveler.loyaltyPrograms.id(loyaltyProgramId));
           traveler.save().then(updatedLoyaltyprogram =>{
               console.log("LoyaltProgram Sucessfully updated");
-              response.status=process.env.UPDATE_SUCESS_STATUS_CODE;
+              response.status=process.env.UPDATE_SUCCESS_STATUS_CODE;
               response.message=updatedLoyaltyprogram;
           }).catch(err=>{
               console.log("Error updating loyaltyProgram: ",err);
               response.status=process.env.UPDATE_ERROR_CODE;
               response.message=err;
-          })
-          .finally(()=>{
+          }).finally(() =>{
+              console.log("Response on finally Callback Function: ",response);
             _sendResponse(res,response);
-          });
+
+          } );
           
       }
-_updateOne(req,res,loyaltyprogramUpdate);
-
-    
-
+     
+    _updateOne(req,res,loyaltyprogramUpdate);
 
   }
      
 
 const _updateOne =function(req,res,updatedLoyaltyprogramCallback){
-    
     console.log("_updateOne controller Requested");
-    response.status=process.env.UPDATE_SUCESS_STATUS_CODE;
-    response.message={};
+    let response = {status:process.env.UPDATE_SUCCESS_STATUS_CODE,message:{}}
     let loyaltyProgramToBeUpdated={};
     const travelerId = req.params.travellerId;
     const loyaltyProgramId =req.params.loyaltyProgramId;
+    console.log("response 1:", response);
     if(!mongoose.isValidObjectId(travelerId)){
         console.log("Invalid TravelerId");
         response.status=process.env.USER_ERROR_CODE;
         response.message={"travellerId not found:":travelerId};
     }else{
         console.log("valid traveler ID");
-        Traveller.findById(travelerId).exec().then(traveler=>{
+        Traveller.findById(travelerId).exec()
+        .then(traveler=>{
             console.log("Loyalty Program found: ",traveler.loyaltyPrograms.id(loyaltyProgramId));
             response.message=traveler;
             loyaltyProgramToBeUpdated = traveler;
-
-            console.log("inside promise: ",loyaltyProgramToBeUpdated);
+            //console.log("inside promise: ",loyaltyProgramToBeUpdated);
 
         }).catch(err=>{
             console.log("Loyalty Program was not found: ",err);
@@ -187,13 +221,14 @@ const _updateOne =function(req,res,updatedLoyaltyprogramCallback){
             response.message=err;
         })
         .finally(()=>{
-            if(response.status!=process.env.UPDATE_SUCESS_STATUS_CODE){
+            console.log("Check response: ", response);
+            if(response.status!=process.env.UPDATE_SUCCESS_STATUS_CODE){
                 console.log("Error found");
                 _sendResponse(res,response);
             }else{
-                console.log("calling callbackfunction");
-                console.log(loyaltyProgramId);
-                console.log(loyaltyProgramToBeUpdated);
+                //console.log("calling callbackfunction");
+                //console.log(loyaltyProgramId);
+                //console.log(loyaltyProgramToBeUpdated);
                 updatedLoyaltyprogramCallback(req,res,loyaltyProgramToBeUpdated,loyaltyProgramId, response);
             };
         });
@@ -205,4 +240,4 @@ const _updateOne =function(req,res,updatedLoyaltyprogramCallback){
     
 }
 
-module.exports={ getAll,addOne,getOne, deleteOne, updateFull};
+module.exports={ getAll,addOne,getOne, deleteOne, updateFull,updatePartial};

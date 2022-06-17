@@ -21,7 +21,8 @@ router.route("/travellers/:travellerId/loyaltyprograms")
 router.route("/travellers/:travellerId/loyaltyprograms/:loyaltyProgramId")
 .get(loyaltyProgramsController.getOne)
 .delete(loyaltyProgramsController.deleteOne)
-.put(loyaltyProgramsController.updateFull);
+.put(loyaltyProgramsController.updateFull)
+.patch(loyaltyProgramsController.updatePartial);
 
 
 

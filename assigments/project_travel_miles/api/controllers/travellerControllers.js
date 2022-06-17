@@ -53,6 +53,7 @@ const deleteOne = function(req,res){
 
 const addOne = function(req,res){
     console.log("Traveller AddOne Requested");
+    console.log(req.body);
    
 
 
@@ -120,6 +121,7 @@ const _sendResponse = function(res,response){
 
 const fullUpdateOne = function(req,res){
 console.log("full updateOne controller requested");
+console.log(req.body);
 travellerUpdate=function(req,res,traveller,response){
     traveller.name =req.body.name;
     traveller.passport = req.body.passport;
